@@ -395,6 +395,7 @@ Throughout the project, every function at every stage either **does exactly what
 
 - [_sceFiberGetThreadFramePointerAddress](../../core/libs/prx/libSceFiber/Export.cpp) (libSceFiber, NID `0dy4JtMUcMQ`) forwards to `sceFiberGetThreadFramePointerAddress`; that the argument list matches is inferred from the export without the underscore, as for the underscore Ult exports, not measured
 - [sceAgcAcbWaitUntilSafeForRendering](../../core/libs/prx/libSceAgc/Acb/src/Control.cpp) (libSceAgc) - `(buffer, videoOutHandle, displayBufferIndex)`, the declared arguments, which PPSA12544 (01.000.010) passes inside `waitUntilSafeForRendering` and `waitUntilSafeForRendering VR` markers on an asynchronous compute command buffer, ignoring the result. It writes the same rendering-wait packet as `sceAgcDcbWaitUntilSafeForRendering`, which the driver now accepts on compute queues too; the wait blocks only that queue's worker. Whether the console encodes the compute variant differently is not known
+- [sceKernelGetEventError](../../core/libs/prx/libkernel/Equeue/src/EventAccessors.cpp) (libkernel) - taken from the [fpPS4](https://github.com/red-prig/fpPS4/blob/trunk/kernel/ps4_queue.pas) reimplementation of the PS4 library, not confirmed on a PS5 title: a non-zero `fflags` is returned as the kernel error code `0x80020000 | fflags`; `EV_ERROR` and `data` are not read
 
 ### Functional
 

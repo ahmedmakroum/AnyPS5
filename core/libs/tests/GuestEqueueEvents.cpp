@@ -20,6 +20,7 @@ int APS5_VABI sceKernelAddHRTimerEvent(KernelEqueue eq, int id, const KernelTime
 int APS5_VABI sceKernelAddTimerEvent(KernelEqueue eq, int id, KernelUseconds usec, void* udata);
 int APS5_VABI sceKernelDeleteTimerEvent(KernelEqueue eq, int id);
 intptr_t APS5_VABI sceKernelGetEventData(const KernelEvent* ev);
+int APS5_VABI sceKernelGetEventError(const KernelEvent* ev);
 intptr_t APS5_VABI sceKernelGetEventFflags(const KernelEvent* ev);
 int APS5_VABI sceKernelGetEventFilter(const KernelEvent* ev);
 uintptr_t APS5_VABI sceKernelGetEventId(const KernelEvent* ev);
@@ -243,12 +244,23 @@ static void VerifyRepeatedAmprCompletionsAreNotLost() {
     Require(sceKernelDeleteEqueue(eq) == SCE_OK);
 }
 
+static void VerifyEventErrorFromFflags() {
+    KernelEvent ev{};
+    Require(sceKernelGetEventError(&ev) == SCE_OK);
+    ev.fflags = 22;
+    Require(sceKernelGetEventError(&ev) == static_cast<int>(0x80020016));
+    ev.fflags = 1;
+    Require(sceKernelGetEventError(&ev) == static_cast<int>(0x80020001));
+    Require(RejectsNull(sceKernelGetEventError));
+}
+
 int main() {
     VerifyPeriodicTimer();
     VerifyUserEventReportedOncePerWait();
     VerifyBlockingWaitReportsLevelEventOnce();
     VerifyEdgeUserEventReportedOnce();
     VerifyRepeatedAmprCompletionsAreNotLost();
+    VerifyEventErrorFromFflags();
 
     KernelEqueue eq = 0;
     Require(sceKernelCreateEqueue(&eq, "events") == SCE_OK);
